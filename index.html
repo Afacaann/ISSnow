@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="icon" href="favicon.ico">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=\, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link
+         rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""
+        />
+        <script
+         src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin="">
+        </script>
+        <style type="text/css">
+            body {
+                background-image: url('image.jpg');
+                background-size: cover;
+                font-family: Helvetica;
+            }
+            #ISSMap {
+                position: relative;
+                left: 20px;;
+                height: 300px;
+                width: 400px;
+                
+            }
+            .firsttext{
+                position: relative;
+                left:250px;
+                color:rgb(68, 67, 67);
+                font-family:"Trebuchet MS", Helvetica, sans-serif;
+
+
+            }
+            .firsttext .thin {
+
+                font-weight: bold;
+                color:rgb(255, 153, 20);
+            }
+            .latlon{
+                height: 10px;
+                width: auto;
+                color:rgb(102, 100, 100) ;
+                font-size: 10px;
+                margin-top:0px;
+                position: relative;
+                left:20px;
+            }
+            .pra {
+                color:rgb(102, 102, 102);
+                position: relative;
+                font-size:10px;
+                width: 250px;
+                position: relative;
+                left:500px;
+                bottom:320px;
+
+            }
+            .pra .thin {
+
+            font-weight: bold;
+            color: rgb(255, 153, 20);
+            }
+                
+        
+        </style>
+        <title>Live ISS coordinates</title>
+        
+    </head>
+    <body>
+        <h1 class="firsttext" >
+            Where is the<span class="thin"> ISS </span> now?
+        </h1>
+        
+        
+    
+
+        <div id="ISSMap"></div>
+        <script>
+            //Map and Tiles part:
+            const mymap = L.map('ISSMap').setView([0, 0], 1);
+
+            const attribution =
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+            
+            const tileURL= 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+            const tiles = L.tileLayer(tileURL,{attribution});
+            tiles.addTo(mymap)
+            
+            //Marker and Icon Part:
+            const ISSIcon = L.icon({
+            iconUrl: 'International_Space_Station.svg.png',
+            iconSize: [30, 15],
+            iconAnchor: [25, 16],
+            });
+
+
+            const marker = L.marker([0,0],{icon:ISSIcon}).addTo(mymap);
+            
+            const api_url = "https://api.wheretheiss.at/v1/satellites/25544"
+
+            let firstTime = true;
+            
+            async function getISS()  {
+            const response = await fetch(api_url);
+            const data= await response.json();
+            const { latitude , longitude } = data;
+
+            marker.setLatLng([latitude,longitude]);
+            if (firstTime) {
+                mymap.setView([latitude,longitude],2);
+                firstTime = false;
+            }
+            document.getElementById("lat").textContent = latitude.toFixed(4);
+            document.getElementById("lon").textContent = longitude.toFixed(4);
+            console.log(latitude);
+            console.log(longitude);
+            }
+            getISS();
+
+           setInterval(getISS,1000);
+
+
+        </script>
+        <p class="latlon" id="latlon">
+            latitude: <span id="lat"></span><br /> longitude: <span id="lon"></span> 
+        </p>
+        
+        <p class="pra">
+            <span class="thin">The International Space Station (ISS)</span> is a modular space station (habitable artificial satellite) in low Earth orbit. 
+            The ISS program is a multi-national collaborative project between five participating space agencies:<span class="thin"> NASA (United States), Roscosmos (Russia), JAXA (Japan), ESA (Europe), and CSA (Canada)</span>. 
+            The ownership and use of the space station is established by intergovernmental treaties and agreements. 
+            It evolved from the Space Station Freedom proposal.
+            The ISS serves as a microgravity and space environment research laboratory in which scientific experiments are conducted in <span class="thin">astrobiology, astronomy, meteorology, physics, and other fields</span>.
+             The station is suited for testing the spacecraft systems and equipment required for possible future long-duration missions to the <span class="thin">Moon and Mars</span>. 
+             It is the largest artificial object in space and the largest satellite in low Earth orbit, regularly visible to the<span class="thin"> naked eye from Earth's surface. </span>
+             It maintains an orbit with an average altitude of 400 kilometres (250 mi) by means of reboost manoeuvres using the engines of the Zvezda Service Module or visiting spacecraft. 
+             The ISS circles the Earth in roughly <span class="thin">93 minutes</span>, completing <span class="thin">15.5 orbits</span> per day.
+
+        </p>
+
+
+    </body>
+</html>
